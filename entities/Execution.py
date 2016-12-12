@@ -14,12 +14,13 @@ class Execution():
 
 	def load_tasks(self):
 
-		self.tasks = Tasks(self.conn)
+		self.tasks = Tasks(self.conn, self.flower)
 		self.tasks.load_by_exec_id(self._id)
 
-	def __init__(self, dao_execution, conn=None):
+	def __init__(self, dao_execution, conn=None, flower=None):
 
 		self.conn = conn
+		self.flower = flower
 		self._id = dao_execution['id']
 		self.description = dao_execution['description']
 		self.state = dao_execution['state']
