@@ -37,6 +37,8 @@ try:
 
 	for each_execution in executions.executions:
 		print str(each_execution._id) + '. ' + each_execution.description
+		for each_task in each_execution.tasks.tasks:
+			print '\t' + str(each_task._id) + ' - ' + str(each_task.uuid) + ' - ' + str(each_task.execution_id)
 
 except Exception as e:
 	print 'Error: ' + str(e)
