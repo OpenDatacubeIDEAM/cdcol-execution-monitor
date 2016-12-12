@@ -1,4 +1,5 @@
 from dao.Execution import Execution as DAOExecution
+from entities.Tasks import Tasks
 import datetime
 
 class Execution():
@@ -10,6 +11,11 @@ class Execution():
 			'COMPLETED_STATE ':'4',
 			'CANCELED_STATE ':'5'
 			}
+
+	def load_tasks(self):
+
+		self.tasks = Tasks(self.conn)
+		self.tasks.load_by_exec_id(self._id)
 
 	def __init__(self, dao_execution, conn=None):
 
