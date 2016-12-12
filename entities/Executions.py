@@ -14,4 +14,5 @@ class Executions():
 			execution = Execution(each_execution, conn=self.conn, flower=self.flower)
 			execution.load_tasks()
 			execution.sync()
+			execution.save()
 			self.executions.append(execution)
