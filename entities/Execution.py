@@ -65,3 +65,13 @@ class Execution():
 			self.state = self.STATES['COMPLETED_STATE']
 		elif tasks_failure > 0:
 			self.state = self.STATES['ERROR_STATE']
+
+	def save(self):
+
+		dao_execution = DAOExecution(self.conn)
+		dao_execution.update(self._id,
+							self.state,
+							self.started_at,
+							self.finished_at,
+							self.trace_error,
+							self.updated_at)
