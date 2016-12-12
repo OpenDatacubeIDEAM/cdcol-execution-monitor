@@ -24,3 +24,17 @@ class Execution():
 					)
 		rows = cur.fetchall()
 		return rows
+
+	def update(self, _id, state, started_at, finished_at, trace_error, updated_at):
+		cur = self.conn.cursor(cursor_factory=DictCursor)
+		query = ('UPDATE execution_execution SET ' +
+				'state= \'' + str(state) + '\', ' +
+				'started_at= \'' + str(started_at) + '\', ' +
+				'finished_at= \'' + str(finished_at) + '\', ' +
+				'trace_error= \'' + str(trace_error) + '\', ' +
+				'updated_at= \'' + str(updated_at) + '\' ' +
+				'WHERE id=' + str(_id) + ';')
+		query = query.replace('\'None\'', 'NULL')
+		cur.execute(query)
+		self.conn.commit()
+		cur.close()
