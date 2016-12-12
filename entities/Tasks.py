@@ -13,4 +13,5 @@ class Tasks():
 		for each_task in dao_task.get_by_exec_id(exec_id):
 			task = Task(each_task, conn=self.conn, flower=self.flower)
 			task.sync()
+			task.save()
 			self.tasks.append(task)
