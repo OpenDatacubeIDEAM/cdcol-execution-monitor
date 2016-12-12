@@ -40,31 +40,36 @@ class Execution():
 		tasks_revoked = 0
 		tasks_enqueued = 0
 		tasks_started = 0
-		for each_task in self.tasks.tasks:
-			if each_task.state == each_task.STATES['SUCCESS']:
-				tasks_succeeded += 1
-			elif each_task.state == each_task.STATES['FAILURE']:
-				tasks_failure += 1
-			elif each_task.state == each_task.STATES['REVOKED']:
-				tasks_revoked += 1
-				break
-			elif each_task.state == each_task.STATES['PENDING'] or each_task.state == each_task.STATES['RECEIVED']:
-				tasks_enqueued += 1
-			elif each_task.state == each_task.STATES['STARTED']:
-				tasks_started += 1
-				break
-		if tasks_started > 0:
-			self.state = self.STATES['EXECUTING_STATE']
-		elif tasks_enqueued == total_tasks:
-			self.state = self.STATES['ENQUEUED_STATE']
-		elif tasks_enqueued > 0:
-			self.state = self.STATES['EXECUTING_STATE']
-		elif tasks_revoked > 0:
-			self.state = self.STATES['CANCELED_STATE']
-		elif tasks_succeeded == total_tasks:
-			self.state = self.STATES['COMPLETED_STATE']
-		elif tasks_failure > 0:
+		trace_error = ''
+
+		if total_tasks == 0:
 			self.state = self.STATES['ERROR_STATE']
+			self.trace_error = 'No tasks to execute'
+		else:
+			for each_task in self.tasks.tasks:
+				if each_task.state == each_task.STATES['SUCCESS']:
+					tasks_succeeded += 1
+				elif each_task.state == each_task.STATES['FAILURE']:
+					tasks_failure += 1
+				elif each_task.state == each_task.STATES['REVOKED']:
+					tasks_revoked += 1
+				elif each_task.state == each_task.STATES['PENDING'] or each_task.state == each_task.STATES['RECEIVED']:
+					tasks_enqueued += 1
+				elif each_task.state == each_task.STATES['STARTED']:
+					tasks_started += 1
+
+			if tasks_started > 0:
+				self.state = self.STATES['EXECUTING_STATE']
+			elif tasks_enqueued == total_tasks:
+				self.state = self.STATES['ENQUEUED_STATE']
+			elif tasks_enqueued > 0:
+				self.state = self.STATES['EXECUTING_STATE']
+			elif tasks_revoked > 0:
+				self.state = self.STATES['CANCELED_STATE']
+			elif tasks_succeeded == total_tasks:
+				self.state = self.STATES['COMPLETED_STATE']
+			elif tasks_failure > 0:
+				self.state = self.STATES['ERROR_STATE']
 
 	def save(self):
 
