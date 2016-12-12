@@ -48,3 +48,14 @@ class Task():
 				self.end_date = self.get_date(task['revoked'])
 			self.state_updated_at = str(datetime.datetime.now())
 			self.updated_at = str(datetime.datetime.now())
+
+	def save(self):
+
+		dao_task = DAOTask(self.conn)
+		dao_task.update(self._id,
+						self.start_date,
+						self.end_date,
+						self.state,
+						self.state_updated_at,
+						self.updated_at
+						)
