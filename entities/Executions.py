@@ -13,4 +13,5 @@ class Executions():
 		for each_execution in dao_execution.get_enqueued_executing():
 			execution = Execution(each_execution, conn=self.conn, flower=self.flower)
 			execution.load_tasks()
+			execution.sync()
 			self.executions.append(execution)
