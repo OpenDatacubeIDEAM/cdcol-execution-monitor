@@ -12,6 +12,8 @@ CONF_FILE = 'settings.conf'
 conf = ConfigParser()
 conf.read(CONF_FILE)
 
+FLOWER = conf.get('flower','url')
+
 lockfile = LockFile(conf.get('other','lock_file'))
 if lockfile.search():
 	print 'There\'s an execution in progress'
@@ -32,13 +34,13 @@ try:
 
 	dbconn.connect()
 
-	executions = Executions(dbconn.curr_conn)
+	executions = Executions(dbconn.curr_conn, FLOWER)
 	executions.load_enqueued_executing()
 
 	for each_execution in executions.executions:
 		print str(each_execution._id) + '. ' + each_execution.description
 		for each_task in each_execution.tasks.tasks:
-			print '\t' + str(each_task._id) + ' - ' + str(each_task.uuid) + ' - ' + str(each_task.execution_id)
+			print '\t' + str(each_task._id) + ' - ' + str(each_task.uuid) + ' - ' + str(each_task.state) + ' - ' + str(each_task.end_date)
 
 except Exception as e:
 	print 'Error: ' + str(e)
