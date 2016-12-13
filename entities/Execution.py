@@ -4,6 +4,8 @@ import datetime
 
 class Execution():
 
+	TRACE_ERROR = []
+
 	STATES= {
 			'ENQUEUED_STATE':'1',
 			'EXECUTING_STATE':'2',
@@ -15,7 +17,7 @@ class Execution():
 	def load_tasks(self):
 
 		self.tasks = Tasks(self.conn, self.flower)
-		self.tasks.load_by_exec_id(self._id)
+		self.tasks.load_by_exec_id(self._id, self.TRACE_ERROR)
 
 	def __init__(self, dao_execution, conn=None, flower=None):
 
@@ -40,7 +42,6 @@ class Execution():
 		tasks_revoked = 0
 		tasks_enqueued = 0
 		tasks_started = 0
-		trace_error = ''
 
 		if total_tasks == 0:
 			self.state = self.STATES['ERROR_STATE']
@@ -71,6 +72,9 @@ class Execution():
 			elif tasks_failure > 0:
 				self.state = self.STATES['ERROR_STATE']
 
+		for each_trace in self.TRACE_ERROR:
+			self.trace_error += str(each_trace)
+
 	def save(self):
 
 		dao_execution = DAOExecution(self.conn)
@@ -80,3 +84,9 @@ class Execution():
 							self.finished_at,
 							self.trace_error,
 							self.updated_at)
+
+	def flush_trace_error(self):
+
+		dao_execution = DAOExecution(self.conn)
+		dao_execution.flush_trace_error(self._id)
+		self.trace_error = ''
