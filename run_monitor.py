@@ -5,7 +5,7 @@ from entities.LockFile import LockFile
 from entities.Connection import Connection
 from entities.Executions import Executions
 from exceptions import Exception
-import os, sys, datetime, glob
+import os, sys, datetime, glob, traceback
 
 CONF_FILE = 'settings.conf'
 
@@ -43,6 +43,6 @@ try:
 			print '\t' + str(each_task._id) + ' - ' + str(each_task.uuid) + ' - ' + str(each_task.state) + ' - ' + str(each_task.end_date)
 
 except Exception as e:
-	print 'Error: ' + str(e)
+	traceback.print_exc()
 finally:
 	lockfile.delete()
