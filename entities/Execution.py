@@ -47,6 +47,7 @@ class Execution():
 		if total_tasks == 0:
 			self.state = self.STATES['ERROR_STATE']
 			self.trace_error = 'No tasks to execute'
+			self.finished_at = self.started_at
 		else:
 			for each_task in self.tasks.tasks:
 				if each_task.state == each_task.STATES['SUCCESS']:
