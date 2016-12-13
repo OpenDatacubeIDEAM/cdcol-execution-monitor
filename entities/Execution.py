@@ -41,6 +41,8 @@ class Execution():
 		tasks_revoked = 0
 		tasks_enqueued = 0
 		tasks_started = 0
+		start_time = None
+		end_time = None
 
 		if total_tasks == 0:
 			self.state = self.STATES['ERROR_STATE']
@@ -58,6 +60,19 @@ class Execution():
 				elif each_task.state == each_task.STATES['STARTED']:
 					tasks_started += 1
 
+				task_start = each_task.start_date
+				task_end = each_task.end_date
+
+				if start_time is None:
+					start_time = task_start
+				elif task_start < start_time:
+					start_time = task_start
+
+				if end_time is None:
+					end_time = task_end
+				elif task_end > end_time:
+					end_time = task_end
+
 			if tasks_started > 0:
 				self.state = self.STATES['EXECUTING_STATE']
 			elif tasks_enqueued == total_tasks:
@@ -66,15 +81,20 @@ class Execution():
 				self.state = self.STATES['EXECUTING_STATE']
 			elif tasks_revoked > 0:
 				self.state = self.STATES['CANCELED_STATE']
+				self.finished_at = end_time
 			elif tasks_succeeded == total_tasks:
 				self.state = self.STATES['COMPLETED_STATE']
+				self.finished_at = end_time
 			elif tasks_failure > 0:
 				self.state = self.STATES['ERROR_STATE']
+				self.finished_at = end_time
 
 		for each_trace in self.TRACE_ERROR:
 			self.trace_error += str(each_trace)
 
 	def save(self):
+
+		self.updated_at = datetime.datetime.now()
 
 		dao_execution = DAOExecution(self.conn)
 		dao_execution.update(self._id,
