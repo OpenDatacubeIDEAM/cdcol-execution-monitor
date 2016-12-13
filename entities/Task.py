@@ -32,9 +32,13 @@ class Task():
 		self.updated_at = dao_task['updated_at']
 		self.execution_id = dao_task['execution_id']
 
-	def sync(self):
+	def sync(self, trace_error=None):
 
 		task = json.loads(urlopen(self.flower + '/api/tasks').read())[self.uuid]
+
+		if task['exception'] is not None:
+			trace_error.append('Task UUID: ' + self.uuid + '\n')
+			trace_error.append(task['traceback'])
 
 		if self.state != self.STATES[task['state']]:
 			self.state = self.STATES[task['state']]
