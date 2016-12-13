@@ -46,3 +46,4 @@ except Exception as e:
 	traceback.print_exc()
 finally:
 	lockfile.delete()
+	dbconn.close()
