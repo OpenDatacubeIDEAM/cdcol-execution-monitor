@@ -55,6 +55,8 @@ class Task():
 
 	def save(self):
 
+		self.updated_at = datetime.datetime.now()
+
 		dao_task = DAOTask(self.conn)
 		dao_task.update(self._id,
 						self.start_date,
