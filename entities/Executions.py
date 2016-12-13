@@ -12,6 +12,7 @@ class Executions():
 		dao_execution = DAOExecution(self.conn)
 		for each_execution in dao_execution.get_enqueued_executing():
 			execution = Execution(each_execution, conn=self.conn, flower=self.flower)
+			execution.flush_trace_error()
 			execution.load_tasks()
 			execution.sync()
 			execution.save()
