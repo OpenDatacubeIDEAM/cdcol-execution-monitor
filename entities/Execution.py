@@ -4,8 +4,6 @@ import datetime
 
 class Execution():
 
-	TRACE_ERROR = []
-
 	STATES= {
 			'ENQUEUED_STATE':'1',
 			'EXECUTING_STATE':'2',
@@ -22,6 +20,7 @@ class Execution():
 	def __init__(self, dao_execution, conn=None, flower=None):
 
 		self.conn = conn
+		self.TRACE_ERROR = []
 		self.flower = flower
 		self._id = dao_execution['id']
 		self.description = dao_execution['description']
