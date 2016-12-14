@@ -16,7 +16,7 @@ class Task():
 
 	def get_date(self, timestamp_str):
 
-		return str(datetime.date.fromtimestamp(float(timestamp_str)))
+		return str(datetime.datetime.fromtimestamp(float(timestamp_str)))
 
 	def __init__(self, dao_task, conn=None, flower=None):
 
@@ -42,8 +42,9 @@ class Task():
 
 		if self.state != self.STATES[task['state']]:
 			self.state = self.STATES[task['state']]
-			if self.state != self.STATES['PENDING'] or self.state != self.STATE['RECEIVED']:
-				self.start_date = self.get_date(task['started'])
+			if self.state != self.STATES['PENDING'] and self.state != self.STATES['RECEIVED']:
+				if task['started'] is not None:
+					self.start_date = self.get_date(task['started'])
 			if self.state == self.STATES['SUCCESS']:
 				self.end_date = self.get_date(task['succeeded'])
 			elif self.state == self.STATES['FAILURE']:

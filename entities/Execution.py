@@ -64,15 +64,21 @@ class Execution():
 				task_start = each_task.start_date
 				task_end = each_task.end_date
 
-				if start_time is None:
-					start_time = task_start
-				elif task_start < start_time:
-					start_time = task_start
+				try:
+					if start_time is None:
+						start_time = task_start
+					elif task_start < start_time:
+						start_time = task_start
+				except Exception as e:
+					print 'Error comparando las fechas de inicio: ' + str(e)
 
-				if end_time is None:
-					end_time = task_end
-				elif task_end > end_time:
-					end_time = task_end
+				try:
+					if end_time is None:
+						end_time = task_end
+					elif task_end > end_time:
+						end_time = task_end
+				except Exception as e:
+					print 'Error comparando las fechas de finalizacion: ' + str(e)
 
 			if tasks_started > 0:
 				self.state = self.STATES['EXECUTING_STATE']
