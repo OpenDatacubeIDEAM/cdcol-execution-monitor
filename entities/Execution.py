@@ -32,6 +32,7 @@ class Execution():
 		self.updated_at = dao_execution['updated_at']
 		self.executed_by_id = dao_execution['executed_by_id']
 		self.version_id = dao_execution['version_id']
+		self.results_available = dao_execution['results_available']
 
 	def sync(self):
 
@@ -92,9 +93,11 @@ class Execution():
 			elif tasks_succeeded == total_tasks:
 				self.state = self.STATES['COMPLETED_STATE']
 				self.finished_at = end_time
+				self.results_available = True
 			elif tasks_failure > 0:
 				self.state = self.STATES['ERROR_STATE']
 				self.finished_at = end_time
+				self.results_available = True
 
 		for each_trace in self.TRACE_ERROR:
 			self.trace_error += str(each_trace)
@@ -109,7 +112,8 @@ class Execution():
 							self.started_at,
 							self.finished_at,
 							self.trace_error,
-							self.updated_at)
+							self.updated_at,
+							self.results_available)
 
 	def flush_trace_error(self):
 
