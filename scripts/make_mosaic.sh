@@ -9,16 +9,24 @@ YSIZE=0
 xsize_list=''
 ysize_list=''
 
+OUTPUT_FILE=''
+
+# Set variable value to the GRID_FILE_VAR variable
 # $1 = Variable name
 # $2 = Variable value
 function set_var {
 	GRID_FILE_VAR=$(echo "$GRID_FILE_VAR" | sed -e "s/\(^$1[ ]*=\).*$/\1 $2/")
 }
 
+# Get the value of an variable
+# $1 = Grid var name
+# $2 = Variable name
 function get_var {
 	echo "$1" | grep $2 | sed -e "s/^[^=]*=[ ]*\([^ ]*\).*$/\1/"
 }
 
+# Sum of a list of numbers
+# $1 = Number list
 function sum_list {
 	SUM=0
 	for each_num in $1
@@ -63,3 +71,17 @@ set_var xfirst "$XFIRST"
 set_var yfirst "$YFIRST"
 
 echo "$GRID_FILE_VAR" > $GRID_FILE
+
+# Create mosaic
+first="true"
+tmp_output=tmp_output.nc
+for each_file in $(find . -regex '^.*_[^_]*\.nc')
+do
+	if $first 
+	then
+		cdo enlarge,$GRID_FILE $each_file $tmp_output
+		cdo setrtomiss,-1.e30,1.e30 $tmp_output $OUTPUT_FILE &&rm $tmp_output
+ 		first="false"
+	fi
+		cdo mergegrid $OUTPUT_FILE $each_file $tmp_output &&mv -f $tmp_output $OUTPUT_FILE
+done
