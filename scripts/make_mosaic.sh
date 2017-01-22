@@ -10,7 +10,8 @@ YSIZE=0
 xsize_list=''
 ysize_list=''
 
-OUTPUT_FILE=''
+TMP_OUTPUT=$NETCDF_PATH/tmpoutput.nc
+OUTPUT_FILE=$NETCDF_PATH/'mosaic'
 
 # Set variable value to the GRID_FILE_VAR variable
 # $1 = Variable name
@@ -37,54 +38,63 @@ function sum_list {
 	echo $SUM
 }
 
-FIRST_FILE=true
-
-for each_file in $(ls $NETCDF_PATH/*.nc)
+NETCDF_LIST=''
+for each_file in $(ls $NETCDF_PATH/*_*.nc)
 do
-	if [ $FIRST_FILE = true ]
-	then
-		GRID_FILE_VAR=$(cdo griddes $each_file | grep -E '^[^=]*=[^=]*$')
-		FIRST_FILE=false
-	fi
-	cdo_griddes=$(cdo griddes $each_file)
-	xsize_list="$xsize_list;$(get_var "$cdo_griddes" xfirst) $(get_var "$cdo_griddes" xsize)"
-	ysize_list="$ysize_list;$(get_var "$cdo_griddes" yfirst) $(get_var "$cdo_griddes" ysize)"
+	NETCDF_LIST="$NETCDF_LIST ${each_file##*_}"
 done
 
-xsize_list="$(echo $xsize_list | sed -e 's/;/\n/g' | sort -t ' ' -u -n -k 1)"
-ysize_list="$(echo $ysize_list | sed -e 's/;/\n/g' | sort -t ' ' -r -u -n -k 1)"
-
-XFIRST="${xsize_list%% *}"
-YFIRST="${ysize_list%% *}"
-
-xsize_list="$(echo "$xsize_list" | cut -d ' ' -f 2)"
-ysize_list="$(echo "$ysize_list" | cut -d ' ' -f 2)"
-
-XSIZE=$(sum_list "$xsize_list")
-YSIZE=$(sum_list "$ysize_list")
-
-GRID_SIZE=$(echo "$XSIZE * $YSIZE" | bc)
-
-set_var gridsize "$GRID_SIZE"
-set_var xsize "$XSIZE"
-set_var ysize "$YSIZE"
-set_var xfirst "$XFIRST"
-set_var yfirst "$YFIRST"
-
-echo "$GRID_FILE_VAR" > $GRID_FILE
-
-# Create mosaic
-first="true"
-tmp_output=tmp_output.nc
-for each_file in $(find . -regex '^.*_[^_]*\.nc')
+for each_suffix in $(echo $NETCDF_LIST | sed -e 's/ /\n/g' | sort -u)
 do
-	if $first 
-	then
-		cdo enlarge,$GRID_FILE $each_file $tmp_output
-		cdo setrtomiss,-1.e30,1.e30 $tmp_output $OUTPUT_FILE &&rm $tmp_output
- 		first="false"
-	fi
-		cdo mergegrid $OUTPUT_FILE $each_file $tmp_output &&mv -f $tmp_output $OUTPUT_FILE
+	FIRST_FILE=true
+	for each_file in $(ls $NETCDF_PATH/*_$each_suffix)
+	do
+		if [ $FIRST_FILE = true ]
+		then
+			GRID_FILE_VAR=$(cdo griddes $each_file | grep -E '^[^=]*=[^=]*$')
+			FIRST_FILE=false
+		fi
+		cdo_griddes=$(cdo griddes $each_file)
+		xsize_list="$xsize_list;$(get_var "$cdo_griddes" xfirst) $(get_var "$cdo_griddes" xsize)"
+		ysize_list="$ysize_list;$(get_var "$cdo_griddes" yfirst) $(get_var "$cdo_griddes" ysize)"
+	done
+	
+	xsize_list="$(echo $xsize_list | sed -e 's/;/\n/g' | sort -t ' ' -u -n -k 1)"
+	ysize_list="$(echo $ysize_list | sed -e 's/;/\n/g' | sort -t ' ' -r -u -n -k 1)"
+	
+	XFIRST="${xsize_list%% *}"
+	YFIRST="${ysize_list%% *}"
+	
+	xsize_list="$(echo "$xsize_list" | cut -d ' ' -f 2)"
+	xsize_list="$(echo "$xsize_list" | cut -d ' ' -f 2)"
+	ysize_list="$(echo "$ysize_list" | cut -d ' ' -f 2)"
+	
+	XSIZE=$(sum_list "$xsize_list")
+	YSIZE=$(sum_list "$ysize_list")
+	
+	GRID_SIZE=$(echo "$XSIZE * $YSIZE" | bc)
+	
+	set_var gridsize "$GRID_SIZE"
+	set_var xsize "$XSIZE"
+	set_var ysize "$YSIZE"
+	set_var xfirst "$XFIRST"
+	set_var yfirst "$YFIRST"
+	
+	echo "$GRID_FILE_VAR" > $GRID_FILE
+
+	# Create mosaic
+	first="true"
+	new_mosaic="$OUTPUT_FILE"\_"$each_suffix"
+	for each_file in $(ls $NETCDF_PATH/*_$each_suffix)
+	do
+		if $first 
+		then
+			cdo enlarge,$GRID_FILE $each_file $TMP_OUTPUT
+			cdo setrtomiss,-1.e30,1.e30 $TMP_OUTPUT $new_mosaic &&rm $TMP_OUTPUT
+	 		first="false"
+		fi
+			cdo mergegrid $new_mosaic $each_file $TMP_OUTPUT &&mv -f $TMP_OUTPUT $new_mosaic
+	done
 done
 
 echo done > $LOCK_FILE
