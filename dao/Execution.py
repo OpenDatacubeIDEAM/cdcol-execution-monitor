@@ -18,7 +18,7 @@ class Execution():
 					'created_at, ' +
 					'updated_at, ' +
 					'executed_by_id, ' +
-					'version_id ' +
+					'version_id, ' +
 					'results_available ' +
 					'FROM execution_execution ' +
 					'WHERE state = \'1\' or state = \'2\';'
@@ -33,7 +33,7 @@ class Execution():
 				'started_at= \'' + str(started_at) + '\', ' +
 				'finished_at= \'' + str(finished_at) + '\', ' +
 				'trace_error= \'' + str(trace_error).replace('\'', '"') + '\', ' +
-				'updated_at= \'' + str(updated_at) + '\' ' +
+				'updated_at= \'' + str(updated_at) + '\', ' +
 				'results_available= ' + str(results_available) + ' ' +
 				'WHERE id=' + str(_id) + ';')
 		query = query.replace('\'None\'', 'NULL')
