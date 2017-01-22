@@ -3,6 +3,7 @@
 NETCDF_PATH=$1
 GRID_FILE_VAR=''
 GRID_FILE=$NETCDF_PATH/grid.txt
+LOCK_FILE=$NETCDF_PATH/mosaic.lock
 
 XSIZE=0
 YSIZE=0
@@ -85,3 +86,5 @@ do
 	fi
 		cdo mergegrid $OUTPUT_FILE $each_file $tmp_output &&mv -f $tmp_output $OUTPUT_FILE
 done
+
+echo done > $LOCK_FILE
