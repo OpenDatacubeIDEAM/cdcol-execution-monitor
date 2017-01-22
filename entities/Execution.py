@@ -1,6 +1,7 @@
 from dao.Execution import Execution as DAOExecution
 from entities.Tasks import Tasks
-import datetime
+import datetime, subprocess, os
+from subprocess import CalledProcessError
 
 class Execution():
 
@@ -17,11 +18,13 @@ class Execution():
 		self.tasks = Tasks(self.conn, self.flower)
 		self.tasks.load_by_exec_id(self._id, self.TRACE_ERROR)
 
-	def __init__(self, dao_execution, conn=None, flower=None):
+	def __init__(self, dao_execution, conn=None, flower=None, results_path=None, make_mosaic_script=None):
 
 		self.conn = conn
 		self.TRACE_ERROR = []
 		self.flower = flower
+		self.results_path = str(results_path) + '/' + str(dao_execution['id'])
+		self.make_mosaic_script = make_mosaic_script
 		self._id = dao_execution['id']
 		self.description = dao_execution['description']
 		self.state = dao_execution['state']
@@ -91,9 +94,19 @@ class Execution():
 				self.state = self.STATES['CANCELED_STATE']
 				self.finished_at = end_time
 			elif tasks_succeeded == total_tasks:
-				self.state = self.STATES['COMPLETED_STATE']
-				self.finished_at = end_time
-				self.results_available = True
+				if os.path.exists(self.results_path + '/mosaic.lock'):
+					with open(self.results_path + '/mosaic.lock', 'r') as ifile:
+						content = ifile.readline().replace('\n','')
+						if content == 'done':
+							self.state = self.STATES['COMPLETED_STATE']
+							self.finished_at = end_time
+							self.results_available = True
+							os.remove(self.results_path + '/mosaic.lock')
+				else:
+					with open(self.results_path + '/mosaic.lock', 'w') as ofile:
+						ofile.write('running')
+						subprocess.Popen([self.make_mosaic_script, self.results_path])
+
 			elif tasks_failure > 0:
 				self.state = self.STATES['ERROR_STATE']
 				self.finished_at = end_time

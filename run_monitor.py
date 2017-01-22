@@ -13,6 +13,8 @@ conf = ConfigParser()
 conf.read(CONF_FILE)
 
 FLOWER = conf.get('flower','url')
+RESULTS_PATH = conf.get('other','results_path')
+MAKE_MOSAIC = conf.get('other', 'make_mosaic_script')
 
 lockfile = LockFile(conf.get('other','lock_file'))
 if lockfile.search():
@@ -34,7 +36,7 @@ try:
 
 	dbconn.connect()
 
-	executions = Executions(dbconn.curr_conn, FLOWER)
+	executions = Executions(dbconn.curr_conn, FLOWER, RESULTS_PATH, MAKE_MOSAIC)
 	executions.load_enqueued_executing()
 
 	for each_execution in executions.executions:
