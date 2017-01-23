@@ -36,6 +36,7 @@ class Execution():
 		self.executed_by_id = dao_execution['executed_by_id']
 		self.version_id = dao_execution['version_id']
 		self.results_available = dao_execution['results_available']
+		self.generate_mosaic = dao_execution['generate_mosaic']
 
 	def sync(self):
 
@@ -94,19 +95,23 @@ class Execution():
 				self.state = self.STATES['CANCELED_STATE']
 				self.finished_at = end_time
 			elif tasks_succeeded == total_tasks:
-				if os.path.exists(self.results_path + '/mosaic.lock'):
-					with open(self.results_path + '/mosaic.lock', 'r') as ifile:
-						content = ifile.readline().replace('\n','')
-						if content == 'done':
-							self.state = self.STATES['COMPLETED_STATE']
-							self.finished_at = end_time
-							self.results_available = True
-							os.remove(self.results_path + '/mosaic.lock')
+				if self.generate_mosaic:
+					if os.path.exists(self.results_path + '/mosaic.lock'):
+						with open(self.results_path + '/mosaic.lock', 'r') as ifile:
+							content = ifile.readline().replace('\n','')
+							if content == 'done':
+								self.state = self.STATES['COMPLETED_STATE']
+								self.finished_at = end_time
+								self.results_available = True
+								os.remove(self.results_path + '/mosaic.lock')
+					else:
+						with open(self.results_path + '/mosaic.lock', 'w') as ofile:
+							ofile.write('running')
+							subprocess.Popen([self.make_mosaic_script, self.results_path])
 				else:
-					with open(self.results_path + '/mosaic.lock', 'w') as ofile:
-						ofile.write('running')
-						subprocess.Popen([self.make_mosaic_script, self.results_path])
-
+					self.state = self.STATES['COMPLETED_STATE']
+					self.finished_at = end_time
+					self.results_available = True
 			elif tasks_failure > 0:
 				self.state = self.STATES['ERROR_STATE']
 				self.finished_at = end_time

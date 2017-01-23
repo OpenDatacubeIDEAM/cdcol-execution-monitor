@@ -9,19 +9,21 @@ class Execution():
 	def get_enqueued_executing(self):
 		cur = self.conn.cursor(cursor_factory=DictCursor)
 		cur.execute('SELECT ' +
-					'id, ' +
-					'description, ' +
-					'state, ' +
-					'started_at, ' +
-					'finished_at, ' +
-					'trace_error, ' +
-					'created_at, ' +
-					'updated_at, ' +
-					'executed_by_id, ' +
-					'version_id, ' +
-					'results_available ' +
-					'FROM execution_execution ' +
-					'WHERE state = \'1\' or state = \'2\';'
+					'e.id, ' +
+					'e.description, ' +
+					'e.state, ' +
+					'e.started_at, ' +
+					'e.finished_at, ' +
+					'e.trace_error, ' +
+					'e.created_at, ' +
+					'e.updated_at, ' +
+					'e.executed_by_id, ' +
+					'e.version_id, ' +
+					'e.results_available, ' +
+					'a.generate_mosaic ' +
+					'FROM execution_execution as e inner join algorithm_version as v on e.version_id = v.id ' +
+					'inner join algorithm_algorithm as a on v.algorithm_id = a.id ' +
+					'WHERE e.state = \'1\' or e.state = \'2\';'
 					)
 		rows = cur.fetchall()
 		return rows
