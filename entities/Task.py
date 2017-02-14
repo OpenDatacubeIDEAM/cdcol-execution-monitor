@@ -34,25 +34,28 @@ class Task():
 
 	def sync(self, trace_error=None):
 
-		task = json.loads(urlopen(self.flower + '/api/tasks').read())[self.uuid]
+		try:
+			task = json.loads(urlopen(self.flower + '/api/tasks').read())[self.uuid]
 
-		if task['exception'] is not None:
-			trace_error.append('Task UUID: ' + self.uuid + '\n')
-			trace_error.append(task['traceback'])
+			if task['exception'] is not None:
+				trace_error.append('Task UUID: ' + self.uuid + '\n')
+				trace_error.append(task['traceback'])
 
-		if self.state != self.STATES[task['state']]:
-			self.state = self.STATES[task['state']]
-			if self.state != self.STATES['PENDING'] and self.state != self.STATES['RECEIVED']:
-				if task['started'] is not None:
-					self.start_date = self.get_date(task['started'])
-			if self.state == self.STATES['SUCCESS']:
-				self.end_date = self.get_date(task['succeeded'])
-			elif self.state == self.STATES['FAILURE']:
-				self.end_date = self.get_date(task['failed'])
-			elif self.state == self.STATES['REVOKED']:
-				self.end_date = self.get_date(task['revoked'])
-			self.state_updated_at = str(datetime.datetime.now())
-			self.updated_at = str(datetime.datetime.now())
+			if self.state != self.STATES[task['state']]:
+				self.state = self.STATES[task['state']]
+				if self.state != self.STATES['PENDING'] and self.state != self.STATES['RECEIVED']:
+					if task['started'] is not None:
+						self.start_date = self.get_date(task['started'])
+				if self.state == self.STATES['SUCCESS']:
+					self.end_date = self.get_date(task['succeeded'])
+				elif self.state == self.STATES['FAILURE']:
+					self.end_date = self.get_date(task['failed'])
+				elif self.state == self.STATES['REVOKED']:
+					self.end_date = self.get_date(task['revoked'])
+				self.state_updated_at = str(datetime.datetime.now())
+				self.updated_at = str(datetime.datetime.now())
+		except Exception as e:
+			return 'Error: ' + str(e)
 
 	def save(self):
 
