@@ -97,4 +97,5 @@ do
 	done
 done
 
+rm $GRID_FILE
 echo done > $LOCK_FILE
