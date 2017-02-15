@@ -18,13 +18,15 @@ class Execution():
 		self.tasks = Tasks(self.conn, self.flower)
 		self.tasks.load_by_exec_id(self._id, self.TRACE_ERROR)
 
-	def __init__(self, dao_execution, conn=None, flower=None, results_path=None, make_mosaic_script=None):
+	def __init__(self, dao_execution, conn=None, flower=None, results_path=None, make_mosaic_script=None, gif_algo=None, gif_script=None):
 
 		self.conn = conn
 		self.TRACE_ERROR = []
 		self.flower = flower
 		self.results_path = str(results_path) + '/' + str(dao_execution['id'])
 		self.make_mosaic_script = make_mosaic_script
+		self.gif_algo = int(gif_algo)
+		self.gif_script = gif_script
 		self._id = dao_execution['id']
 		self.description = dao_execution['description']
 		self.state = dao_execution['state']
@@ -37,6 +39,7 @@ class Execution():
 		self.version_id = dao_execution['version_id']
 		self.results_available = dao_execution['results_available']
 		self.generate_mosaic = dao_execution['generate_mosaic']
+		self.alg_id = dao_execution['alg_id']
 
 	def sync(self):
 
@@ -108,6 +111,19 @@ class Execution():
 						with open(self.results_path + '/mosaic.lock', 'w') as ofile:
 							ofile.write('running')
 							subprocess.Popen([self.make_mosaic_script, self.results_path])
+				elif self.gif_algo == self.alg_id:
+					if os.path.exists(self.results_path + '/mosaic.lock'):
+						with open(self.results_path + '/mosaic.lock', 'r') as ifile:
+							content = ifile.readline().replace('\n','')
+							if content == 'done':
+								self.state = self.STATES['COMPLETED_STATE']
+								self.finished_at = end_time
+								self.results_available = True
+								os.remove(self.results_path + '/mosaic.lock')
+					else:
+						with open(self.results_path + '/mosaic.lock', 'w') as ofile:
+							ofile.write('running')
+							subprocess.Popen([self.gif_script, self.results_path])
 				else:
 					self.state = self.STATES['COMPLETED_STATE']
 					self.finished_at = end_time

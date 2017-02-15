@@ -20,7 +20,8 @@ class Execution():
 					'e.executed_by_id, ' +
 					'e.version_id, ' +
 					'e.results_available, ' +
-					'a.generate_mosaic ' +
+					'a.generate_mosaic, ' +
+					'a.id alg_id ' +
 					'FROM execution_execution as e inner join algorithm_version as v on e.version_id = v.id ' +
 					'inner join algorithm_algorithm as a on v.algorithm_id = a.id ' +
 					'WHERE e.state = \'1\' or e.state = \'2\';'
