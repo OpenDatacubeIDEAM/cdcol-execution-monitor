@@ -10,7 +10,6 @@ postfix=sys.argv[2]
 os.chdir(folder)
 output=None
 for file in glob.glob("*_{}".format(postfix)):
-    print output
     if(output is None):
         output=xr.open_dataset(file)
     else:
@@ -19,8 +18,9 @@ print output
 
 
 # In[6]:
-
-output.to_netcdf('mosaico_xarr_{}'.format(postfix))
+comp = dict(zlib=True, complevel=4)
+encoding = {var: comp for var in output.data_vars}
+output.to_netcdf('mosaico_xarr_{}'.format(postfix),encoding=encoding)
 
 
 # In[ ]:
