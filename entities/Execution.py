@@ -129,6 +129,18 @@ class Execution():
 					self.finished_at = end_time
 					self.results_available = True
 			elif tasks_failure > 0:
+				if self.generate_mosaic:
+					if os.path.exists(self.results_path + '/mosaic.lock'):
+						with open(self.results_path + '/mosaic.lock', 'r') as ifile:
+							content = ifile.readline().replace('\n','')
+							if content == 'done':
+								self.finished_at = end_time
+								self.results_available = True
+								os.remove(self.results_path + '/mosaic.lock')
+					else:
+						with open(self.results_path + '/mosaic.lock', 'w') as ofile:
+							ofile.write('running')
+							subprocess.Popen(["/bin/bash", self.make_mosaic_script, self.results_path])
 				self.state = self.STATES['ERROR_STATE']
 				self.finished_at = end_time
 				self.results_available = True
