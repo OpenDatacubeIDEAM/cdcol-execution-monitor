@@ -53,6 +53,7 @@ class Execution():
 		end_time = None
 
 		if total_tasks == 0:
+            print 'ERROR 1'
 			self.state = self.STATES['ERROR_STATE']
 			self.trace_error = 'No tasks to execute'
 			self.finished_at = self.started_at
@@ -97,19 +98,23 @@ class Execution():
 			elif tasks_revoked > 0:
 				self.state = self.STATES['CANCELED_STATE']
 				self.finished_at = end_time
-			elif tasks_succeeded == total_tasks:
+			elif tasks_succeeded == total_tasks or ( tasks_succeeded > 0 and ( tasks_succeeded + tasks_failure ) == total_tasks ):
+				print 'SUCCESS'
 				if self.generate_mosaic:
 					if os.path.exists(self.results_path + '/mosaic.lock'):
 						with open(self.results_path + '/mosaic.lock', 'r') as ifile:
 							content = ifile.readline().replace('\n','')
+                            print 'CONTENT: '+str(content)
 							if content == 'done':
+                                print 'SUCCESS 1'
 								self.state = self.STATES['COMPLETED_STATE']
 								self.finished_at = end_time
 								self.results_available = True
 								os.remove(self.results_path + '/mosaic.lock')
 					else:
 						with open(self.results_path + '/mosaic.lock', 'w') as ofile:
-							ofile.write('running')
+                            print 'CONTENT 2'
+							ofile.write('running ||' + self.make_mosaic_script + ' || ' + self.results_path)
 							subprocess.Popen(["/bin/bash", self.make_mosaic_script, self.results_path])
 				elif self.gif_algo == self.alg_id:
 					if os.path.exists(self.results_path + '/mosaic.lock'):
@@ -129,18 +134,7 @@ class Execution():
 					self.finished_at = end_time
 					self.results_available = True
 			elif tasks_failure > 0:
-				if self.generate_mosaic:
-					if os.path.exists(self.results_path + '/mosaic.lock'):
-						with open(self.results_path + '/mosaic.lock', 'r') as ifile:
-							content = ifile.readline().replace('\n','')
-							if content == 'done':
-								self.finished_at = end_time
-								self.results_available = True
-								os.remove(self.results_path + '/mosaic.lock')
-					else:
-						with open(self.results_path + '/mosaic.lock', 'w') as ofile:
-							ofile.write('running')
-							subprocess.Popen(["/bin/bash", self.make_mosaic_script, self.results_path])
+                print 'ERROR 2'
 				self.state = self.STATES['ERROR_STATE']
 				self.finished_at = end_time
 				self.results_available = True
