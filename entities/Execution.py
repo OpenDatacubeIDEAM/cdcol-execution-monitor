@@ -134,7 +134,7 @@ class Execution():
 					self.finished_at = end_time
 					self.results_available = True
 			elif tasks_failure > 0:
-                print 'ERROR 2'
+		                print 'ERROR 2'
 				self.state = self.STATES['ERROR_STATE']
 				self.finished_at = end_time
 				self.results_available = True
