@@ -113,7 +113,7 @@ class Execution():
 								os.remove(self.results_path + '/mosaic.lock')
 					else:
 						with open(self.results_path + '/mosaic.lock', 'w') as ofile:
-                            print 'CONTENT 2'
+			                                print 'CONTENT 2'
 							ofile.write('running ||' + self.make_mosaic_script + ' || ' + self.results_path)
 							subprocess.Popen(["/bin/bash", self.make_mosaic_script, self.results_path])
 				elif self.gif_algo == self.alg_id:
