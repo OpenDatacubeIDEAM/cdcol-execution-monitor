@@ -104,7 +104,7 @@ class Execution():
 					if os.path.exists(self.results_path + '/mosaic.lock'):
 						with open(self.results_path + '/mosaic.lock', 'r') as ifile:
 							content = ifile.readline().replace('\n','')
-                                print 'CONTENT: '+str(content)
+                                                        print 'CONTENT: '+str(content)
 							if content == 'done':
                                 print 'SUCCESS 1'
 								self.state = self.STATES['COMPLETED_STATE']
