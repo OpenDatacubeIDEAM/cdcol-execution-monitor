@@ -106,7 +106,7 @@ class Execution():
 							content = ifile.readline().replace('\n','')
                                                         print 'CONTENT: '+str(content)
 							if content == 'done':
-                                print 'SUCCESS 1'
+                                                                print 'SUCCESS 1'
 								self.state = self.STATES['COMPLETED_STATE']
 								self.finished_at = end_time
 								self.results_available = True
