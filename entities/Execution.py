@@ -53,7 +53,7 @@ class Execution():
 		end_time = None
 
 		if total_tasks == 0:
-            print 'ERROR 1'
+	                print 'ERROR 1'
 			self.state = self.STATES['ERROR_STATE']
 			self.trace_error = 'No tasks to execute'
 			self.finished_at = self.started_at
