@@ -39,6 +39,7 @@ class Execution():
 		self.version_id = dao_execution['version_id']
 		self.results_available = dao_execution['results_available']
 		self.generate_mosaic = dao_execution['generate_mosaic']
+		self.exec_generate_mosaic = dao_execution['exec_generate_mosaic']
 		self.alg_id = dao_execution['alg_id']
 
 	def sync(self):
@@ -100,7 +101,7 @@ class Execution():
 				self.finished_at = end_time
 			elif tasks_succeeded == total_tasks or ( tasks_succeeded > 0 and ( tasks_succeeded + tasks_failure ) == total_tasks ):
 				print 'SUCCESS'
-				if self.generate_mosaic:
+				if self.generate_mosaic and self.exec_generate_mosaic:
 					if os.path.exists(self.results_path + '/mosaic.lock'):
 						with open(self.results_path + '/mosaic.lock', 'r') as ifile:
 							content = ifile.readline().replace('\n','')

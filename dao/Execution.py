@@ -20,6 +20,7 @@ class Execution():
 					'e.executed_by_id, ' +
 					'e.version_id, ' +
 					'e.results_available, ' +
+					'e.generate_mosaic exec_generate_mosaic, ' +
 					'a.generate_mosaic, ' +
 					'a.id alg_id ' +
 					'FROM execution_execution as e inner join algorithm_version as v on e.version_id = v.id ' +
