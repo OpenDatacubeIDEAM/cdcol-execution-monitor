@@ -39,6 +39,7 @@ class Execution():
 		self.version_id = dao_execution['version_id']
 		self.results_available = dao_execution['results_available']
 		self.generate_mosaic = dao_execution['generate_mosaic']
+		self.exec_generate_mosaic = dao_execution['exec_generate_mosaic']
 		self.alg_id = dao_execution['alg_id']
 
 	def sync(self):
@@ -58,6 +59,7 @@ class Execution():
 			self.trace_error = 'No tasks to execute'
 			self.finished_at = self.started_at
 		else:
+			start_execution = None
 			for each_task in self.tasks.tasks:
 				if each_task.state == each_task.STATES['SUCCESS']:
 					tasks_succeeded += 1
@@ -69,6 +71,8 @@ class Execution():
 					tasks_enqueued += 1
 				elif each_task.state == each_task.STATES['STARTED']:
 					tasks_started += 1
+					if self.started_at is None and (start_execution is None or each_task.start_date < start_execution):
+						start_execution = each_task.start_date
 
 				task_start = each_task.start_date
 				task_end = each_task.end_date
@@ -89,6 +93,9 @@ class Execution():
 				except Exception as e:
 					print 'Error comparando las fechas de finalizacion: ' + str(e)
 
+			if self.started_at is None and tasks_started > 0:
+				self.started_at = start_execution
+
 			if tasks_started > 0:
 				self.state = self.STATES['EXECUTING_STATE']
 			elif tasks_enqueued == total_tasks:
@@ -100,7 +107,7 @@ class Execution():
 				self.finished_at = end_time
 			elif tasks_succeeded == total_tasks or ( tasks_succeeded > 0 and ( tasks_succeeded + tasks_failure ) == total_tasks ):
 				print 'SUCCESS'
-				if self.generate_mosaic:
+				if self.generate_mosaic and self.exec_generate_mosaic:
 					if os.path.exists(self.results_path + '/mosaic.lock'):
 						with open(self.results_path + '/mosaic.lock', 'r') as ifile:
 							content = ifile.readline().replace('\n','')
