@@ -93,7 +93,7 @@ class Execution():
 				except Exception as e:
 					print 'Error comparando las fechas de finalizacion: ' + str(e)
 
-			if self.started_at is None and tasks_started > 0:
+			if self.started_at is None:
 				self.started_at = start_execution
 
 			if tasks_started > 0:
