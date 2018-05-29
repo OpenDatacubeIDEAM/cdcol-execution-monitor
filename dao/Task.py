@@ -17,9 +17,9 @@ class Task():
 					'state_updated_at, ' +
 					'created_at, ' +
 					'updated_at, ' +
-					'execution_id ' +
-					'parameters'+
-					'trace_error'+
+					'execution_id, ' +
+					'parameters, '+
+					'trace_error '+
 					'FROM execution_task ' +
 					'WHERE execution_id = \'' + str(exec_id) + '\';')
 		rows = cur.fetchall()
@@ -32,8 +32,8 @@ class Task():
 				'end_date=\'' + str(end_date) + '\', ' +
 				'state=\'' + str(state) + '\', ' +
 				'state_updated_at=\'' + str(state_updated_at) + '\', ' +
-				'updated_at=\'' + str(updated_at) + '\' ' +
-				'trace_error=\'' + str(trace_error) + '\' ' +
+				'updated_at=\'' + str(updated_at) + '\', ' +
+				'trace_error=\'' + str(trace_error) + '\', ' +
 				'parameters=\'' + str(parameters) + '\' ' +
 				'WHERE id=' + str(_id) + ';')
 
