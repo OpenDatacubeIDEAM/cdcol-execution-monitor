@@ -71,7 +71,7 @@ class Execution():
 					tasks_enqueued += 1
 				elif each_task.state == each_task.STATES['STARTED']:
 					tasks_started += 1
-					if self.started_at is None and (start_execution is None or each_task.start_date < start_execution):
+					if start_execution is None or each_task.start_date < start_execution:
 						start_execution = each_task.start_date
 
 				task_start = each_task.start_date
@@ -93,8 +93,10 @@ class Execution():
 				except Exception as e:
 					print 'Error comparando las fechas de finalizacion: ' + str(e)
 
-			if self.started_at is None:
+			if start_execution:
 				self.started_at = start_execution
+			else:
+				self.started_at = self.created_at
 
 			if tasks_started > 0:
 				self.state = self.STATES['EXECUTING_STATE']
