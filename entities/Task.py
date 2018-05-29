@@ -31,13 +31,15 @@ class Task():
 		self.created_at = dao_task['created_at']
 		self.updated_at = dao_task['updated_at']
 		self.execution_id = dao_task['execution_id']
+		self.parameters = dao_task['parameters']
+		self.trace_error = dao_task['trace_error']
 
 	def sync(self, trace_error=None):
 
 		try:
 			task = json.loads(urlopen(self.flower + '/api/tasks').read())[self.uuid]
-			#self.parameters = json.dump(task['kwargs']);
-			self.parameters = "prueba"
+			self.parameters = json.dump(task['kwargs']);
+			#self.parameters = "prueba"
 			print task
 			if task['exception'] is not None:
 				trace_error.append('Task UUID: ' + self.uuid + '\n')
@@ -58,6 +60,7 @@ class Task():
 					self.end_date = self.get_date(task['failed'])
 				elif self.state == self.STATES['REVOKED']:
 					self.end_date = self.get_date(task['revoked'])
+
 				self.state_updated_at = str(datetime.datetime.now())
 				self.updated_at = str(datetime.datetime.now())
 		except Exception as e:
@@ -73,5 +76,7 @@ class Task():
 						self.end_date,
 						self.state,
 						self.state_updated_at,
-						self.updated_at
+						self.updated_at,
+						self.trace_error,
+						self.parameters,
 						)

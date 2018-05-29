@@ -18,12 +18,14 @@ class Task():
 					'created_at, ' +
 					'updated_at, ' +
 					'execution_id ' +
+					'parameters'+
+					'trace_error'+
 					'FROM execution_task ' +
 					'WHERE execution_id = \'' + str(exec_id) + '\';')
 		rows = cur.fetchall()
 		return rows
 
-	def update(self, _id, start_date, end_date, state, state_updated_at, updated_at):
+	def update(self, _id, start_date, end_date, state, state_updated_at, updated_at, trace_error, parameters):
 		cur = self.conn.cursor(cursor_factory=DictCursor)
 		query = ('UPDATE execution_task SET ' +
 				'start_date=\'' + str(start_date) + '\', ' +
@@ -31,6 +33,8 @@ class Task():
 				'state=\'' + str(state) + '\', ' +
 				'state_updated_at=\'' + str(state_updated_at) + '\', ' +
 				'updated_at=\'' + str(updated_at) + '\' ' +
+				'trace_error=\'' + str(trace_error) + '\' ' +
+				'parameters=\'' + str(parameters) + '\' ' +
 				'WHERE id=' + str(_id) + ';')
 
 		query = query.replace('\'None\'', 'NULL')
