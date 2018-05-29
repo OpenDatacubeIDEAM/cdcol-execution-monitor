@@ -36,10 +36,12 @@ class Task():
 
 		try:
 			task = json.loads(urlopen(self.flower + '/api/tasks').read())[self.uuid]
-
+			self.parameters = task['kwargs'];
 			if task['exception'] is not None:
 				trace_error.append('Task UUID: ' + self.uuid + '\n')
 				trace_error.append(task['traceback'])
+				self.trace_error = task['traceback'];
+				self.updated_at = str(datetime.datetime.now())
 
 			if self.state != self.STATES[task['state']]:
 				self.state = self.STATES[task['state']]
@@ -48,6 +50,8 @@ class Task():
 						self.start_date = self.get_date(task['started'])
 				if self.state == self.STATES['SUCCESS']:
 					self.end_date = self.get_date(task['succeeded'])
+					if task['results'] is not None:
+						self.results = task['results']
 				elif self.state == self.STATES['FAILURE']:
 					self.end_date = self.get_date(task['failed'])
 				elif self.state == self.STATES['REVOKED']:
