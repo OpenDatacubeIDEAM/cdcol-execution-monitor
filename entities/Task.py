@@ -38,13 +38,13 @@ class Task():
 
 		try:
 			task = json.loads(urlopen(self.flower + '/api/tasks').read())[self.uuid]
-			self.parameters = json.dump(task['kwargs']);
-			#self.parameters = "prueba"
+			#self.parameters = json.dump(task['kwargs']);
+			self.parameters = 'prueba'
 			print task
 			if task['exception'] is not None:
 				trace_error.append('Task UUID: ' + self.uuid + '\n')
 				trace_error.append(task['traceback'])
-				self.trace_error = task['traceback'];
+				self.trace_error = task['traceback']
 				self.updated_at = str(datetime.datetime.now())
 
 			if self.state != self.STATES[task['state']]:
