@@ -26,6 +26,7 @@ dag = DAG(
 task = BashOperator(
     dag=dag,
     task_id='cdcol_updater_task',
-    bash_command='python /web_storage/algorithms/cdcol_updater/cdcol_updater.py'
+    bash_command='python /web_storage/algorithms/cdcol_updater/cdcol_updater.py',
+    queue='util'
 )
 
