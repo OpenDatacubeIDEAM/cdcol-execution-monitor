@@ -40,6 +40,18 @@ WEB_DB_CONN_DATA = {
 }
 
 
+
+WEB_EXECUTING_STATE = '2'
+WEB_ERROR_STATE = '3'
+WEB_COMPLETED_STATE = '4'
+
+AIRFLOW_TO_WEB_STATES = {
+    'running': WEB_EXECUTING_STATE,
+    'success': WEB_COMPLETED_STATE,
+    'failed': WEB_ERROR_STATE
+}
+
+
 def select_query(query_str,conn_data):
     """Perform select queries.
     
@@ -188,24 +200,21 @@ def update_executions():
             bool(dag_run)
         )
         if dag_run:
-            dag_id, state, start_date, end_date, execution_date = dag_run
+            dag_id, dag_state, start_date, end_date, execution_date = dag_run
             logging.info(
                 'Dag %s has finished (%s), state (%s)',dag_id,bool(end_date),state
             )
 
-            if start_date and end_date:
-                success = '4'
-                error = '3'                
-                state = success if state in 'success' else error
-                updated = update_execution(
-                    dag_id=dag_id,
-                    state=state,
-                    start_date=start_date,
-                    end_date=end_date,
-                    execution_date=execution_date,
-                )
-                logging.info('Dag %s updated (%s)',dag_id,bool(updated))
-                
+            state = AIRFLOW_TO_WEB_STATES.get(dag_state)
+            updated = update_execution(
+                dag_id=dag_id,
+                state=state,
+                start_date=start_date,
+                end_date=end_date,
+                execution_date=execution_date,
+            )
+            logging.info('Dag %s updated (%s)',dag_id,bool(updated))
+            
 
 
 if __name__ == '__main__':
