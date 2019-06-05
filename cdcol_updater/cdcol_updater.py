@@ -26,15 +26,15 @@ logging.basicConfig(
 Database connection data.
 """
 AIRFLOW_DB_CONN_DATA = {
-    'host':'172.24.99.218',
+    'host':'192.168.106.21',
     'dbname':'airflow',
     'user':'airflow',
     'passwd':'cubocubo'
 }
 
 WEB_DB_CONN_DATA = {
-    'host':'172.24.99.218',
-    'dbname':'ideam',
+    'host':'192.168.106.21',
+    'dbname':'ideam_1',
     'user':'portal_web',
     'passwd':'CDCol_web_2016'
 }
@@ -167,7 +167,7 @@ def update_execution(**fields):
     results_available fields of a given dag_id
     """
 
-    query_format = (
+    query_format_1 = (
         'UPDATE execution_execution SET '
         'state=\'%(state)s\', '
         'started_at=\'%(start_date)s\', '
@@ -176,6 +176,18 @@ def update_execution(**fields):
         'WHERE dag_id=\'%(dag_id)s\';'
     )
 
+
+
+    query_format_2 = (
+        'UPDATE execution_execution SET '
+        'state=\'%(state)s\', '
+        'started_at=\'%(start_date)s\' '
+        'WHERE dag_id=\'%(dag_id)s\';'
+    )
+
+    end_date = fields.get('end_date')
+
+    query_format = query_format_1 if end_date else query_format_2
     query_str = query_format % fields
     row_count = update_query(query_str,WEB_DB_CONN_DATA)
     return row_count
@@ -202,7 +214,7 @@ def update_executions():
         if dag_run:
             dag_id, dag_state, start_date, end_date, execution_date = dag_run
             logging.info(
-                'Dag %s has finished (%s), state (%s)',dag_id,bool(end_date),state
+                'Dag %s has finished (%s), state (%s)',dag_id,bool(end_date),dag_state
             )
 
             state = AIRFLOW_TO_WEB_STATES.get(dag_state)
