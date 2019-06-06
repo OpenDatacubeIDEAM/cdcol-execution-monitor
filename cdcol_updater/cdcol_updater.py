@@ -128,10 +128,10 @@ def get_enqueued_state_executions():
         'SELECT '
         'dag_id '
         'FROM execution_execution '
-        'WHERE state = \'%s\' ;'
+        'WHERE state = \'%s\' OR state = \'%s\';'
     )
 
-    query_str = query_format % ('1',)
+    query_str = query_format % ('1','2')
     rows = select_query(query_str,WEB_DB_CONN_DATA)
     return rows
 
